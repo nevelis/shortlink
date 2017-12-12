@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models, IntegrityError
 from django.core.validators import URLValidator
 
 import random
@@ -30,8 +30,11 @@ class LinkEntry(models.Model):
    def create(url, caption=None):
       entry = LinkEntry()
       if caption:
-         entry.short_link = caption.translate(
-               ''.join(LinkEntry.ALLOWED_CHARS))[:LinkEntry.MAX_LINK_LENGTH]
+         bad_characters = set(caption) - set(LinkEntry.ALLOWED_CHARS)
+         if bad_characters:
+            raise Exception('Invalid characters in caption: ' + ' '.join(bad_characters))
+         if len(caption) > LinkEntry.MAX_LINK_LENGTH:
+            raise Exception('Caption is too long')
       else:
          entry.short_link = ''.join(random.choice(LinkEntry.ALLOWED_CHARS)
                for _ in range(LinkEntry.SHORTLINK_LENGTH))
@@ -40,5 +43,11 @@ class LinkEntry(models.Model):
       validator(url)
 
       entry.target_url = url
-      entry.save()
+
+      try:
+         entry.save()
+      except IntegrityError, e:
+         if 'Duplicate' in str(e):
+            raise Exception('A link with this caption already exists')
+         raise
       return entry

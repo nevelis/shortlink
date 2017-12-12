@@ -5,21 +5,29 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanen
 from django.shortcuts import render
 from shortlink.models import LinkEntry
 from shortlink.forms import LinkShortenForm
+import json
 
 def index(request):
    return render(request, 'index.tpl', { 'link_form': LinkShortenForm() })
 
 def shorten(request):
-   caption = request.POST['caption'] if 'caption' in request.POST else None
-   target_url = request.POST['target_url']
+   if 'x-www-form-urlencoded' in request.content_type:
+      caption = request.POST.get('caption', None)
+      target_url = request.POST['target_url']
+   elif 'json' in request.content_type:
+      data = json.loads(request.body)
+      caption = data.get('caption', None)
+      target_url = data.get('target_url')
+   else:
+      return HttpResponse(status=406) # Not Acceptable
 
    try:
       link_entry = LinkEntry.create(target_url, caption=caption)
-   except:
-      return HttpResponse(status=400)
+   except Exception, e:
+      return HttpResponse(e, status=400)
 
    return JsonResponse({
-         'short_link': link_entry.short_link,
+         'short_link': '//{}/{}'.format(request.get_host(), link_entry.short_link),
          'target_url': target_url,
       }, status=201)
 
