@@ -65,3 +65,4 @@ class APITests(TestCase):
 
       response = c.get('/{}'.format(data['short_link']))
       self.assertEqual(301, response.status_code)
+      self.assertEqual(response.url, target_url)

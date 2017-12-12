@@ -2,8 +2,12 @@
 from __future__ import unicode_literals
 
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import render
 from shortlink.models import LinkEntry
+from shortlink.forms import LinkShortenForm
+
+def index(request):
+   return render(request, 'index.tpl', { 'link_form': LinkShortenForm() })
 
 def shorten(request):
    caption = request.POST['caption'] if 'caption' in request.POST else None
