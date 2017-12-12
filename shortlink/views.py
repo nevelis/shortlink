@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect, JsonResponse
 from django.shortcuts import redirect
 from shortlink.models import LinkEntry
 
@@ -18,3 +18,11 @@ def shorten(request):
          'short_link': link_entry.short_link,
          'target_url': target_url,
       }, status=201)
+
+def follow(request, short_link):
+   try:
+      link_entry = LinkEntry.objects.get(short_link=short_link)
+   except LinkEntry.DoesNotExist:
+      return HttpResponseNotFound()
+
+   return HttpResponsePermanentRedirect(link_entry.target_url)

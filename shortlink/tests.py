@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from django.test import Client, TestCase
 from shortlink.models import LinkEntry
 
+import json
+
 # Requirements:
 # - Random numbers for ours (no counter)
 # - Allow a user to specify own caption
@@ -49,3 +51,17 @@ class APITests(TestCase):
          'target_url': 'HUEHEHUEHUE',
       })
       self.assertEqual(400, response.status_code)
+
+   def test_create_and_follow_link(self):
+      c = Client()
+      target_url = 'https://docs.djangoproject.com/en/1.11/topics/testing/tools/'
+      response = c.post('/shorten/', {
+         'caption': 'PythonTestingTools',
+         'target_url': target_url
+      })
+      self.assertEqual(201, response.status_code)
+      data = json.loads(response.content)
+      self.assertEqual(target_url, data['target_url'])
+
+      response = c.get('/{}'.format(data['short_link']))
+      self.assertEqual(301, response.status_code)
