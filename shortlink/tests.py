@@ -42,3 +42,10 @@ class APITests(TestCase):
          'target_url': 'https://docs.djangoproject.com/en/1.11/topics/testing/tools/',
       })
       self.assertEqual(201, response.status_code)
+
+   def test_reject_invalid_urls(self):
+      c = Client()
+      response = c.post('/shorten/', {
+         'target_url': 'HUEHEHUEHUE',
+      })
+      self.assertEqual(400, response.status_code)

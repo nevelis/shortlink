@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.core.validators import URLValidator
+
 import random
 import string
 
@@ -33,6 +35,10 @@ class LinkEntry(models.Model):
       else:
          entry.short_link = ''.join(random.choice(LinkEntry.ALLOWED_CHARS)
                for _ in range(LinkEntry.SHORTLINK_LENGTH))
+
+      validator = URLValidator()
+      validator(url)
+
       entry.target_url = url
       entry.save()
       return entry

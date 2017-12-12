@@ -9,7 +9,11 @@ def shorten(request):
    caption = request.POST['caption'] if 'caption' in request.POST else None
    target_url = request.POST['target_url']
 
-   link_entry = LinkEntry.create(target_url, caption=caption)
+   try:
+      link_entry = LinkEntry.create(target_url, caption=caption)
+   except:
+      return HttpResponse(status=400)
+
    return JsonResponse({
          '': link_entry.short_link,
          'target_url': target_url,
