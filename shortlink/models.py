@@ -25,10 +25,14 @@ class LinkEntry(models.Model):
    target_url = models.CharField(max_length=MAX_TARGET_LENGTH)
 
    @staticmethod
-   def create(url):
+   def create(url, caption=None):
       entry = LinkEntry()
-      entry.short_link = ''.join(random.choice(LinkEntry.ALLOWED_CHARS)
-            for _ in range(LinkEntry.SHORTLINK_LENGTH))
+      if caption:
+         entry.short_link = caption.translate(
+               ''.join(LinkEntry.ALLOWED_CHARS))[:LinkEntry.MAX_LINK_LENGTH]
+      else:
+         entry.short_link = ''.join(random.choice(LinkEntry.ALLOWED_CHARS)
+               for _ in range(LinkEntry.SHORTLINK_LENGTH))
       entry.target_url = url
       entry.save()
       return entry
