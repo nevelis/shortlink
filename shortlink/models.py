@@ -35,6 +35,7 @@ class LinkEntry(models.Model):
             raise Exception('Invalid characters in caption: ' + ' '.join(bad_characters))
          if len(caption) > LinkEntry.MAX_LINK_LENGTH:
             raise Exception('Caption is too long')
+         entry.short_link = caption
       else:
          entry.short_link = ''.join(random.choice(LinkEntry.ALLOWED_CHARS)
                for _ in range(LinkEntry.SHORTLINK_LENGTH))
