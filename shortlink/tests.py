@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from django.test import Client, TestCase
 from shortlink.models import LinkEntry
 
 # Requirements:
@@ -33,3 +33,12 @@ class ShortLinkTests(TestCase):
             LinkEntry.ALLOWED_CHARS]
 
       self.assertFalse(bad_characters)
+
+
+class APITests(TestCase):
+   def test_create_link_via_api(self):
+      c = Client()
+      response = c.post('/shorten/', {
+         'target_url': 'https://docs.djangoproject.com/en/1.11/topics/testing/tools/',
+      })
+      self.assertEqual(201, response.status_code)
