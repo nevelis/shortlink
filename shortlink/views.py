@@ -15,6 +15,6 @@ def shorten(request):
       return HttpResponse(status=400)
 
    return JsonResponse({
-         '': link_entry.short_link,
+         'short_link': link_entry.short_link,
          'target_url': target_url,
       }, status=201)
